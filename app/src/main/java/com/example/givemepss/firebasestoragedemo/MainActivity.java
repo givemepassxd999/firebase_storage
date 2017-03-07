@@ -40,25 +40,21 @@ public class MainActivity extends AppCompatActivity {
 
     private void initData() {
         mStorageRef = FirebaseStorage.getInstance().getReference();
-        boolean hasPermission = checkPermission();
-        if(hasPermission){
-            getLocalImg();
-        } else{
+    }
+
+    private void checkPermission(){
+        int permission = ActivityCompat.checkSelfPermission(MainActivity.this,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
             //未取得權限，向使用者要求允許權限
             ActivityCompat.requestPermissions(this,
                     new String[] {android.Manifest.permission.READ_EXTERNAL_STORAGE},
                     REQUEST_EXTERNAL_STORAGE
             );
+        } else {
+            getLocalImg();
         }
-    }
 
-    private boolean checkPermission(){
-        int permission = ActivityCompat.checkSelfPermission(MainActivity.this,
-                android.Manifest.permission.READ_EXTERNAL_STORAGE);
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            return false;
-        }
-        return true;
     }
 
     private void initView() {
@@ -67,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         pickFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getLocalImg();
+                checkPermission();
             }
         });
     }
@@ -78,6 +74,20 @@ public class MainActivity extends AppCompatActivity {
         picker.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
         Intent destIntent = Intent.createChooser(picker, null);
         startActivityForResult(destIntent, PICKER);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_EXTERNAL_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getLocalImg();
+                } else {
+                    Toast.makeText(MainActivity.this, R.string.do_nothing, Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
     }
 
     @Override
@@ -118,8 +128,6 @@ public class MainActivity extends AppCompatActivity {
                 if ("primary".equalsIgnoreCase(type)) {
                     return Environment.getExternalStorageDirectory() + "/" + split[1];
                 }
-
-                // TODO handle non-primary volumes
             }
             // DownloadsProvider
             else if (isDownloadsDocument(uri)) {
