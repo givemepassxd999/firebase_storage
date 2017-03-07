@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">FirebaseStorageDemo</string>
+    <string name="get_local_img">取得照片</string>
+</resources>
