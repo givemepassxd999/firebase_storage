@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "288200009661-qp8g6r1suai12bcvl8199ip69fe60qar.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.givemepss.firebasestoragedemo",
+            "certificate_hash": "1cd6217e0d774dc06a28ce167dbbc885d9e25168"
+          }
+        },
+        {
           "client_id": "288200009661-cttb5vqovmec6tjtqsare5tui7cgf7o1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
