@@ -18,6 +18,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,15 +34,18 @@ public class MainActivity extends AppCompatActivity {
     private static final int PICKER = 100;
     private static final int REQUEST_EXTERNAL_STORAGE = 200;
     private TextView infoText;
-    private Button pickFile;
+    private Button pickImgButton;
     private StorageReference mStorageRef;
+    private Button uploadImgButton;
+    private Button downloadImgButton;
+    private ImageView pickImg;
+    private ImageView downloadImg;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initData();
         initView();
-
     }
 
     private void initData() {
@@ -65,8 +69,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void initView() {
         infoText = (TextView) findViewById(R.id.info_text);
-        pickFile = (Button) findViewById(R.id.pick_file);
-        pickFile.setOnClickListener(new View.OnClickListener() {
+        pickImgButton = (Button) findViewById(R.id.pick_button);
+        pickImg = (ImageView) findViewById(R.id.pick_img);
+        uploadImgButton = (Button) findViewById(R.id.upload_button);
+        downloadImg = (ImageView) findViewById(R.id.download_img);
+        downloadImgButton = (Button) findViewById(R.id.download_button);
+
+        pickImgButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 checkPermission();

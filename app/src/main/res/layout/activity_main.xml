@@ -10,15 +10,36 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/info_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
     <Button
         android:text="@string/get_local_img"
-        android:id="@+id/pick_file"
+        android:id="@+id/pick_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <Button
+        android:layout_toRightOf="@id/pick_button"
+        android:id="@+id/upload_button"
+        android:text="@string/upload_file"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <Button
+        android:layout_toRightOf="@id/upload_button"
+        android:id="@+id/download_button"
+        android:text="@string/download_file"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:layout_below="@id/pick_button"
+        android:id="@+id/info_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <ImageView
+        android:id="@+id/pick_img"
         android:layout_below="@id/info_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <ImageView
+        android:layout_below="@id/pick_img"
+        android:id="@+id/download_img"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 </RelativeLayout>

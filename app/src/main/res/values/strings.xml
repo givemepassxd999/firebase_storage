@@ -2,4 +2,6 @@
     <string name="app_name">FirebaseStorageDemo</string>
     <string name="get_local_img">取得照片</string>
     <string name="do_nothing">無權限無法做事!</string>
+    <string name="download_file">下載照片</string>
+    <string name="upload_file">上傳照片</string>
 </resources>
