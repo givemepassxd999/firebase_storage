@@ -4,4 +4,6 @@
     <string name="do_nothing">無權限無法做事!</string>
     <string name="download_file">下載照片</string>
     <string name="upload_file">上傳照片</string>
+    <string name="load_img_fail">讀取圖片失敗</string>
+    <string name="plz_pick_img">請選取照片</string>
 </resources>

@@ -22,6 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <Button
+        android:visibility="gone"
         android:layout_toRightOf="@id/upload_button"
         android:id="@+id/download_button"
         android:text="@string/download_file"
@@ -32,13 +33,21 @@
         android:id="@+id/info_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-    <ImageView
-        android:id="@+id/pick_img"
+    <RelativeLayout
         android:layout_below="@id/info_text"
+        android:id="@+id/upload_layout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/pick_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
     <ImageView
-        android:layout_below="@id/pick_img"
+        android:layout_below="@id/upload_layout"
         android:id="@+id/download_img"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />

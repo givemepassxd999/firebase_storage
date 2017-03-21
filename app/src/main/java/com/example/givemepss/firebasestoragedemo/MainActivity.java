@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private Button downloadImgButton;
     private ImageView pickImg;
     private ImageView downloadImg;
+    private String imgPath;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +83,33 @@ public class MainActivity extends AppCompatActivity {
                 checkPermission();
             }
         });
+        uploadImgButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(imgPath != null && !imgPath.equals("")) {
+                    uploadImg(imgPath);
+                } else{
+                    Toast.makeText(MainActivity.this, R.string.plz_pick_img, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void uploadImg(String path){
+        Uri file = Uri.fromFile(new File(path));
+        StorageReference riversRef = mStorageRef.child(file.getLastPathSegment());
+        UploadTask uploadTask = riversRef.putFile(file);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                infoText.setText(exception.getMessage());
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                infoText.setText("success");
+            }
+        });
     }
 
     private void getLocalImg(){
@@ -110,22 +139,13 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == PICKER) {
             if (resultCode == Activity.RESULT_OK) {
                 Uri uri = data.getData();
-                String path = getPath(MainActivity.this, uri);
-                infoText.setText(path);
-                Uri file = Uri.fromFile(new File(path));
-                StorageReference riversRef = mStorageRef.child(file.getLastPathSegment());
-                UploadTask uploadTask = riversRef.putFile(file);
-                uploadTask.addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        infoText.setText(exception.getMessage());
-                    }
-                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        infoText.setText("success");
-                    }
-                });
+                imgPath = getPath(MainActivity.this, uri);
+                if(imgPath != null && !imgPath.equals("")) {
+                    Toast.makeText(MainActivity.this, imgPath, Toast.LENGTH_SHORT).show();
+                    Glide.with(MainActivity.this).load(imgPath).into(pickImg);
+                } else{
+                    Toast.makeText(MainActivity.this, R.string.load_img_fail, Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }
