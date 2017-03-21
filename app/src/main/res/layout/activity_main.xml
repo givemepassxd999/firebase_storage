@@ -43,7 +43,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <ProgressBar
-            android:layout_width="wrap_content"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="300dp"
             android:layout_height="wrap_content" />
     </RelativeLayout>
     <ImageView
