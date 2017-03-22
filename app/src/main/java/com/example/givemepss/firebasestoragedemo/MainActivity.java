@@ -20,14 +20,17 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -36,14 +39,18 @@ import java.io.File;
 public class MainActivity extends AppCompatActivity {
     private static final int PICKER = 100;
     private static final int REQUEST_EXTERNAL_STORAGE = 200;
-    private TextView infoText;
+    private TextView uploadInfoText;
+    private TextView downloadInfoText;
     private Button pickImgButton;
     private StorageReference mStorageRef;
     private Button uploadImgButton;
     private Button downloadImgButton;
+    private Button deleteImgButton;
     private ImageView pickImg;
     private ImageView downloadImg;
     private String imgPath;
+    private ProgressBar imgUploadProgress;
+    private StorageReference riversRef;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,12 +79,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        infoText = (TextView) findViewById(R.id.info_text);
+        uploadInfoText = (TextView) findViewById(R.id.upload_info_text);
+        downloadInfoText = (TextView) findViewById(R.id.download_info_text);
         pickImgButton = (Button) findViewById(R.id.pick_button);
         pickImg = (ImageView) findViewById(R.id.pick_img);
         uploadImgButton = (Button) findViewById(R.id.upload_button);
         downloadImg = (ImageView) findViewById(R.id.download_img);
         downloadImgButton = (Button) findViewById(R.id.download_button);
+        imgUploadProgress = (ProgressBar) findViewById(R.id.upload_progress);
+        deleteImgButton = (Button) findViewById(R.id.delete_button);
 
         pickImgButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,33 +99,93 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(!TextUtils.isEmpty(imgPath)) {
+                    imgUploadProgress.setVisibility(View.VISIBLE);
                     uploadImg(imgPath);
                 } else{
                     Toast.makeText(MainActivity.this, R.string.plz_pick_img, Toast.LENGTH_SHORT).show();
                 }
             }
         });
+        downloadImgButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                downloadImg(riversRef);
+            }
+        });
+        deleteImgButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteImg(riversRef);
+            }
+        });
+    }
+
+    private void deleteImg(final StorageReference ref){
+        if(ref == null){
+            Toast.makeText(MainActivity.this, R.string.plz_upload_img, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        ref.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(MainActivity.this, R.string.delete_success, Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Toast.makeText(MainActivity.this, exception.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void downloadImg(final StorageReference ref){
+        if(ref == null){
+            Toast.makeText(MainActivity.this, R.string.plz_upload_img, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Glide.with(MainActivity.this)
+                        .using(new FirebaseImageLoader())
+                        .load(ref)
+                        .into(downloadImg);
+                downloadInfoText.setText(R.string.download_success);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                downloadInfoText.setText(exception.getMessage());
+            }
+        });
     }
 
     private void uploadImg(String path){
         Uri file = Uri.fromFile(new File(path));
-        StorageReference riversRef = mStorageRef.child(file.getLastPathSegment());
-        UploadTask uploadTask = riversRef.putFile(file);
+        StorageMetadata metadata = new StorageMetadata.Builder()
+                .setContentDisposition("universe")
+                .setContentType("image/jpg")
+                .build();
+        riversRef = mStorageRef.child(file.getLastPathSegment());
+        UploadTask uploadTask = riversRef.putFile(file, metadata);
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                infoText.setText(exception.getMessage());
+                uploadInfoText.setText(exception.getMessage());
             }
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                infoText.setText(R.string.upload_success);
+                uploadInfoText.setText(R.string.upload_success);
             }
         }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-
+                int progress = (int)((100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount());
+                imgUploadProgress.setProgress(progress);
+                if(progress >= 100){
+                    imgUploadProgress.setVisibility(View.GONE);
+                }
             }
         });
     }
@@ -148,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == Activity.RESULT_OK) {
                 Uri uri = data.getData();
                 imgPath = getPath(MainActivity.this, uri);
-                if(imgPath != null && !imgPath.equals("")) {
+                if(!TextUtils.isEmpty(imgPath)) {
                     Toast.makeText(MainActivity.this, imgPath, Toast.LENGTH_SHORT).show();
                     Glide.with(MainActivity.this).load(imgPath).into(pickImg);
                 } else{

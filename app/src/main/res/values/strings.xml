@@ -7,4 +7,8 @@
     <string name="load_img_fail">讀取圖片失敗</string>
     <string name="plz_pick_img">請選取照片</string>
     <string name="upload_success">上傳成功</string>
+    <string name="download_success">下載成功</string>
+    <string name="download_fail">下載失敗</string>
+    <string name="delete_success">刪除成功</string>
+    <string name="plz_upload_img">請先上傳照片</string>
 </resources>
