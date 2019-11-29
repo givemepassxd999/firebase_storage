@@ -45,7 +45,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             getLocalImg()
         }
-
     }
 
     private fun initView() {
